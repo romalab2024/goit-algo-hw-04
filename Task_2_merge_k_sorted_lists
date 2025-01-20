@@ -1,0 +1,63 @@
+import heapq  # Бібліотека для роботи з мінімальною купою
+import random
+import timeit
+
+def merge_k_sorted_lists(lists):
+    """
+    Об'єднує k відсортованих списків у один відсортований список.
+
+    :param lists: Список відсортованих списків.
+    :return: Один відсортований список.
+    """
+    merged_list = []
+    min_heap = []
+
+    # Додаємо всі перші елементи списків у мін-купу
+    for i, lst in enumerate(lists):
+        if lst:  # Якщо список не порожній
+            heapq.heappush(min_heap, (lst[0], i, 0))  # Додаємо (значення, індекс списку, індекс елемента)
+
+    # Обробляємо купу, поки в ній є елементи
+    while min_heap:
+        value, list_index, element_index = heapq.heappop(min_heap)  # Дістаємо найменший елемент
+        merged_list.append(value)  # Додаємо його до результату
+
+        # Якщо у списку залишились елементи, додаємо наступний елемент до купи
+        if element_index + 1 < len(lists[list_index]):
+            next_value = lists[list_index][element_index + 1]
+            heapq.heappush(min_heap, (next_value, list_index, element_index + 1))
+
+    return merged_list
+
+# Генерація тестових даних
+def generate_test_data(k, size, max_value):
+    """
+    Генерує k відсортованих списків випадкових чисел.
+
+    :param k: Кількість списків.
+    :param size: Кількість елементів у кожному списку.
+    :param max_value: Максимальне значення елементів.
+    :return: Список відсортованих списків.
+    """
+    return [sorted(random.randint(0, max_value) for _ in range(size)) for _ in range(k)]
+
+# Основна частина для запуску
+if __name__ == "__main__":
+    k = 5  # Кількість списків
+    size = 10  # Кількість елементів у кожному списку
+    max_value = 100  # Максимальне значення елемента
+
+    # Генеруємо тестові дані
+    test_data = generate_test_data(k, size, max_value)
+    print("Згенеровані відсортовані списки:")
+    for i, lst in enumerate(test_data):
+        print(f"Список {i + 1}: {lst}")
+
+    # Вимірюємо час виконання алгоритму
+    execution_time = timeit.timeit(lambda: merge_k_sorted_lists(test_data), number=1)
+    merged_list = merge_k_sorted_lists(test_data)
+
+    # Вивід результатів
+    print("\nОб'єднаний відсортований список:")
+    print(merged_list)
+    print(f"\nЧас виконання: {execution_time:.4f} секунд")
